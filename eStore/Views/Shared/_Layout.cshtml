@@ -33,9 +33,21 @@
         </nav>
     </header>
     <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+        <div class="row">
+            <div class="col col-sm-3">
+                <nav class="nav flex-column">
+                    <a class="nav-link active" href="#">Shopping</a>
+                    <a class="nav-link" href="/Product">Product</a>
+                    <a class="nav-link" href="#">Orders</a>
+                    <a class="nav-link" href="#" tabindex="-1" aria-disabled="true">Admin</a>
+                </nav>
+            </div>
+            <div class="col col-sm-9">
+                <main role="main" class="pb-3">
+                    @RenderBody()
+                </main>
+            </div>
+        </div>
     </div>
 
     <footer class="border-top footer text-muted">

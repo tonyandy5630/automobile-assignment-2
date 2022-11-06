@@ -1,0 +1,67 @@
+﻿@model IEnumerable<BusinessObject.ProductObject>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~Views/Shared/_Layout.cshtml";
+}
+
+<h1>Search</h1>
+<form action="Search/Index" method="post">
+
+</form>
+<table>
+    <tr>
+        <td>Product Name: <input type="text" name="txtsearch" value=""/></td>
+        <td>
+            Price range:
+            <select name="price">
+                <option value="1">$0-$50</option>
+                <option value="2">$50-$200</option>
+                <option value="3">$200-$500</option>
+            </select>
+         </td>
+         <td><input type="submit" value="search" name="action"/></td>
+         <td><a href="#">reset</a></td>
+    </tr>
+</table>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Weight)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UnitPrice)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Weight)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UnitPrice)
+            </td>
+            <td>
+                @Html.ActionLink("View", "Details", new { id = item.ProductId })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

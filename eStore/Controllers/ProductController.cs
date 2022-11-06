@@ -1,20 +1,35 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BusinessObject;
+using DataAccess.Repository;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace eStore.Controllers
 {
-    public class HomeController1 : Controller
+    public class ProductController : Controller
     {
         // GET: HomeController1
+        IProductRepository productRepository = null;
+        public ProductController() => productRepository = new ProductRepository();
         public ActionResult Index()
         {
-            return View();
+            var productList = productRepository.GetProducts();
+            return View(productList);
         }
 
         // GET: HomeController1/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details(int? id)
         {
-            return View();
+            if(id == null)
+            {
+                return NotFound();
+            }
+            var product = productRepository.GetProductByID(id.Value);
+            if(product == null)
+            {
+                return NotFound();
+            }
+            return View(product);
         }
 
         // GET: HomeController1/Create
@@ -26,43 +41,71 @@ namespace eStore.Controllers
         // POST: HomeController1/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(ProductObject product)
         {
             try
             {
+                if (ModelState.IsValid)
+                {
+                    productRepository.InsertProduct(product);
+                }
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch(Exception ex)
             {
-                return View();
+                ViewBag.Message = ex.Message;
+                return View(product);
             }
         }
 
         // GET: HomeController1/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit(int? id)
         {
-            return View();
+            if(id == null)
+            {
+                return NotFound();
+            }
+            var product = productRepository.GetProductByID(id.Value);
+            if(product == null)
+            {
+                return NotFound();
+            }
+            return View(product);
         }
 
         // POST: HomeController1/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, ProductObject product)
         {
             try
             {
+                if (ModelState.IsValid)
+                {
+                    productRepository.UpdateProduct(product);
+                }
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                ViewBag.Message = ex.Message;
+                return View(product);
             }
         }
 
         // GET: HomeController1/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult Delete(int? id)
         {
-            return View();
+            if(id == null)
+            {
+                return NotFound();
+            }
+            var product = productRepository.GetProductByID(id.Value);
+            if (product == null)
+            {
+                return NotFound();
+            }
+            return View(product);
         }
 
         // POST: HomeController1/Delete/5
@@ -72,12 +115,15 @@ namespace eStore.Controllers
         {
             try
             {
+                productRepository.DeleteProduct(id);
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (Exception ex)
             {
+                ViewBag.Message = ex.Message;
                 return View();
             }
         }
+        
     }
 }

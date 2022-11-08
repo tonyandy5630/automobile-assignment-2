@@ -60,6 +60,8 @@ namespace DataAccess
             }
             return user;
         }
+
+       
         public List<MemberObject> GetUsers()
         {
             string SQLSelect = "SELECT MemberId, Email, CompanyName, City, Country, Password FROM Member";

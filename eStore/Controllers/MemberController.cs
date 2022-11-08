@@ -58,6 +58,7 @@ namespace eStore.Controllers
             }
         }
 
+        [Route("Member/Edit")]
         // GET: HomeController1/Edit/5
         public ActionResult Edit(int? id)
         {
@@ -74,9 +75,7 @@ namespace eStore.Controllers
         }
 
         // POST: HomeController1/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, MemberObject member)
+        public ActionResult EditAction(int id, MemberObject member)
         {
             try
             {

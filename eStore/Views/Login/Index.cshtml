@@ -1,0 +1,25 @@
+﻿@model BusinessObject.MemberObject
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Login</h1>
+<form asp-controller="Home" asp-action="Login">
+        <div class="mb-3">
+            <label for="email" class="form-label">Email address</label>
+            <input asp-for="Email" type="text" class="form-control" id="email" placeholder="name@example.com">
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input asp-for="Password" type="password" class="form-control" id="password" >
+
+        </div>
+        <div class="col-auto">
+            <button type="submit" value="Submit" class="btn btn-primary mb-3">Login</button>
+        <span  class="text-danger">@ViewBag.Warning</span>
+        </div>
+</form>
+
+

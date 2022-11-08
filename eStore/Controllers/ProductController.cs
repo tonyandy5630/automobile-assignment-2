@@ -59,6 +59,7 @@ namespace eStore.Controllers
         }
 
         // GET: HomeController1/Edit/5
+        [Route("Product/Edit")]
         public ActionResult Edit(int? id)
         {
             if(id == null)
@@ -76,7 +77,7 @@ namespace eStore.Controllers
         // POST: HomeController1/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, ProductObject product)
+        public ActionResult EditAction(int id, ProductObject product)
         {
             try
             {

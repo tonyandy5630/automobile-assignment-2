@@ -20,5 +20,6 @@ namespace DataAccess.Repository
         void DeleteMember(int user);
 
         MemberObject Login(string email, string password);
+        MemberObject getMemberByID(int id);
     }
 }

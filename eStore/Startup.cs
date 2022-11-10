@@ -55,7 +55,7 @@ namespace eStore
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Product}/{action=Index}/");
+                    pattern: "{controller=Login}/{action=Index}/");
             });
         }
     }

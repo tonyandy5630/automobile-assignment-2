@@ -3,6 +3,7 @@ using DataAccess.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
 
 namespace eStore.Controllers
 {
@@ -13,7 +14,12 @@ namespace eStore.Controllers
         public MemberController() => memberRepository = new MemberRepository();
         public ActionResult Index()
         {
+            int? id = HttpContext.Session.GetInt32("id");
             var memberList = memberRepository.GetMembers();
+            if(id != null && id != 1)
+            {
+                memberList = memberList.Where(m => m.MemberId == id.Value);
+            }
             return View(memberList);
         }
 

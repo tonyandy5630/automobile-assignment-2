@@ -34,17 +34,29 @@
         <div class="row">
             <div class="col col-sm-3">
                 <nav class="nav flex-column">
-                    <a class="nav-link active" href="#">Shopping</a>
-                    <a class="nav-link" href="/Product">Product</a>
-                    <a class="nav-link " asp-controller="Search" asp-action="Index">Search</a>
-                    <a class="nav-link " asp-controller="Member" asp-action="Index">Members</a>
-                    <a class="nav-link " asp-controller="Order" asp-action="Index">Order</a>
+
+                    @if (Context.Session.GetString("id") == null)
+                    {
+                        <a href="/login">Login</a>
+                    }
+                    else if (Context.Session.GetInt32("id") == 1)
+                    {
+                        @*This is admin function*@
+                        <a class="nav-link active" href="#">Shopping</a>
+                        <a class="nav-link" href="/Product">Product</a>
+                        <a class="nav-link " asp-controller="Search" asp-action="Index">Search</a>
+                        <a class="nav-link " asp-controller="Member" asp-action="Index">Members</a>
+                        <a class="nav-link " asp-controller="Order" asp-action="Index">Order</a>
+                        
+                    }else{
+                        @*This is user function*@
+                        <a class="nav-link " asp-controller="Member" asp-action="Index">Profile</a>
+                        <a class="nav-link " asp-controller="Order" asp-action="Index">Order</a>
+                    }
+
                     @if (Context.Session.GetString("id") != null) 
                     {
                         <a asp-controller="Home" asp-action="Logout">Logout</a>
-                    }
-                    else{
-                        <a href="/login">Login</a>
                     }
                 </nav>
             </div>

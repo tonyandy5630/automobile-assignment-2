@@ -42,7 +42,7 @@ namespace eStore.Controllers
                     member = memRepo.Login(email, password);
                     if(member != null)
                     {
-                        HttpContext.Session.SetString(SessionName, member.Email);
+                        HttpContext.Session.SetString(SessionName, member.MemberId.ToString());
                     }
 
                 }

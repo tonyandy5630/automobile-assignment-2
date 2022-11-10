@@ -21,7 +21,12 @@ namespace eStore.Controllers
         } 
         public ActionResult Index()
         {
+            int? id = HttpContext.Session.GetInt32("id");
             var orderList = orderRepository.GetOrders();
+            if (id != null && id != 1)
+            {
+                orderList = orderList.Where(m => m.MemberId == id.Value);
+            }
             return View(orderList);
         }
 

@@ -80,7 +80,7 @@ namespace eStore.Controllers
         public ActionResult Logout()
         {
             HttpContext.Session.Clear();
-            return View("../Home/Index");
+            return View("../Login/Index");
         }
     }
 }

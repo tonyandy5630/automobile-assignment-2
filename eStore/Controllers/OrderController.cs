@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BusinessObject;
+using DataAccess.Repository;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Linq;
 
 namespace eStore.Controllers
 {
@@ -7,15 +11,30 @@ namespace eStore.Controllers
     {
         // GET: HomeController1
 
+        IOrderRepository orderRepository = null;
+        IOrderDetailRepository orderDetailRepository = null;    
+        IProductRepository productRepository = null;
+        public OrderController() {
+            orderRepository = new OrderRepository();
+            orderDetailRepository = new OrderDetailRepository();
+            productRepository = new ProductRepository();
+        } 
         public ActionResult Index()
         {
-            return View();
+            var orderList = orderRepository.GetOrders();
+            return View(orderList);
         }
 
         // GET: HomeController1/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            var orders = orderRepository.GetOrders();
+            OrderObject order = orders.SingleOrDefault(o => o.OrderId == id);
+            ViewBag.order = order;
+            var orderDetails = orderDetailRepository.GetOrdersByOrderID(order.OrderId);
+            var product = productRepository.GetProducts();
+            var result = orderDetails.Join(product, a => a.ProductId, b => b.ProductId, (a, b) => b).Distinct();
+            return View(result);
         }
 
         // GET: HomeController1/Create
@@ -61,22 +80,35 @@ namespace eStore.Controllers
         }
 
         // GET: HomeController1/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult Delete(int? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var orders = orderRepository.GetOrders();
+            OrderObject order = orders.FirstOrDefault(o => o.OrderId == id.Value);
+            if (order == null)
+            {
+                return NotFound();
+            }
+            return View(order);
         }
 
         // POST: HomeController1/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id)
         {
             try
             {
+                orderDetailRepository.DeleteListOrderDetail(id);
+                orderRepository.DeleteOrder(id);
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (Exception ex)
             {
+                ViewBag.Message = ex.Message;
                 return View();
             }
         }

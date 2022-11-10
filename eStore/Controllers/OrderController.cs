@@ -2,7 +2,10 @@
 using DataAccess.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace eStore.Controllers
@@ -12,13 +15,14 @@ namespace eStore.Controllers
         // GET: HomeController1
 
         IOrderRepository orderRepository = null;
-        IOrderDetailRepository orderDetailRepository = null;    
+        IOrderDetailRepository orderDetailRepository = null;
         IProductRepository productRepository = null;
-        public OrderController() {
+        public OrderController()
+        {
             orderRepository = new OrderRepository();
             orderDetailRepository = new OrderDetailRepository();
             productRepository = new ProductRepository();
-        } 
+        }
         public ActionResult Index()
         {
             int? id = HttpContext.Session.GetInt32("id");
@@ -45,21 +49,52 @@ namespace eStore.Controllers
         // GET: HomeController1/Create
         public ActionResult Create()
         {
+            List<SelectListItem> listItemOfMemberIDs = new List<SelectListItem>();
+            List<SelectListItem> listItemOfOrderIDs = new List<SelectListItem>();
+
+            IMemberRepository memRepo = new MemberRepository();
+            IEnumerable<MemberObject> memberList = memRepo.GetMembers();
+            IEnumerable<OrderObject> orderList = orderRepository.GetOrders();
+
+            listItemOfMemberIDs = addItemToItemList(memberList);
+
+            ViewData["MemberID"] = listItemOfMemberIDs;
             return View();
         }
+
+        private List<SelectListItem> addItemToItemList(IEnumerable<MemberObject> list)
+        {
+            List<SelectListItem> listItem = new List<SelectListItem>();
+            foreach (MemberObject mem in list)
+            {
+                SelectListItem item = new SelectListItem
+                {
+                    Text = mem.Email,
+                    Value = mem.MemberId.ToString()
+                };
+                listItem.Add(item);
+            }
+            return listItem;
+        }
+
 
         // POST: HomeController1/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(OrderObject order, IFormCollection collection)
         {
             try
             {
+                if (ModelState.IsValid)
+                {
+                    orderRepository.InsertOrder(order);
+                }
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                ViewBag.Message = ex.Message;
+                return View(order);
             }
         }
 
@@ -101,6 +136,7 @@ namespace eStore.Controllers
         }
 
         // POST: HomeController1/Delete/5
+        //[Route("Order/Delete")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id)

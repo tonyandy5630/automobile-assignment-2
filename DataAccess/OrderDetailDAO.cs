@@ -203,10 +203,10 @@ namespace DataAccess
                     parameters.Add(DataProvider.CreateParameter("@OrderId", 4, orderID, DbType.Int32));
                     DataProvider.Update(SQLDelete, CommandType.Text, parameters.ToArray());
                 }
-                else
-                {
-                    throw new Exception("this order does not exist");
-                }
+                //else
+                //{
+                //    throw new Exception("this order does not exist");
+                //}
             }
             catch (Exception ex)
             {

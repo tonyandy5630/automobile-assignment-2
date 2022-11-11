@@ -3,6 +3,7 @@ using DataAccess.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Reflection.Metadata;
 
 namespace eStore.Controllers
 {
@@ -101,7 +102,7 @@ namespace eStore.Controllers
             {
                 return NotFound();
             }
-            var product = productRepository.GetProductByID(id.Value);
+            ProductObject product = productRepository.GetProductByID(id.Value);
             if (product == null)
             {
                 return NotFound();
@@ -112,7 +113,7 @@ namespace eStore.Controllers
         // POST: HomeController1/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id)
         {
             try
             {

@@ -139,7 +139,7 @@ namespace DataAccess
                 OrderObject orderWithID = GetOrderWithID(order.OrderId);
                 if (orderWithID != null)
                 {
-                    string SQLInsert = "UPDATE [Order] SET OrderId = @OrderId, MemberId = @UserId, OrderDate = @OrderDate, RequiredDate = @RequiredDate, ShippedDate = @ShippedDate, Freight = @Freight WHERE OrderId = @OrderId";
+                    string SQLInsert = "UPDATE [Order] SET OrderId = @OrderId, MemberId = @UserId, OrderDate = @OrderDate, RequireDate = @RequiredDate, ShipperDate = @ShippedDate, Freight = @Freight WHERE OrderId = @OrderId";
                     var parameters = new List<SqlParameter>();
                     parameters.Add(DataProvider.CreateParameter("@OrderId", 4, order.OrderId, DbType.Int32));
                     parameters.Add(DataProvider.CreateParameter("@UserId", 4, order.MemberId, DbType.Int32));
@@ -147,7 +147,7 @@ namespace DataAccess
                     parameters.Add(DataProvider.CreateParameter("@RequiredDate", 50, order.RequiredDate, DbType.DateTime));
                     parameters.Add(DataProvider.CreateParameter("@ShippedDate", 50, order.ShippedDate, DbType.DateTime));
                     parameters.Add(DataProvider.CreateParameter("@Freight", 30, order.Freight, DbType.Decimal));
-                    DataProvider.Insert(SQLInsert, CommandType.Text, parameters.ToArray());
+                    DataProvider.Update(SQLInsert, CommandType.Text, parameters.ToArray());
                 }
                 else
                 {

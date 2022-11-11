@@ -28,6 +28,7 @@ namespace eStore
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(30);//You can set Time   
             });
+            services.AddHttpContextAccessor();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

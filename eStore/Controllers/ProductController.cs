@@ -2,7 +2,9 @@
 using DataAccess.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Reflection.Metadata;
 
 namespace eStore.Controllers
@@ -11,6 +13,7 @@ namespace eStore.Controllers
     {
         // GET: HomeController1
         IProductRepository productRepository = null;
+        public const string CARTKEY = "cart";
         public ProductController() => productRepository = new ProductRepository();
         public ActionResult Index()
         {
@@ -18,19 +21,118 @@ namespace eStore.Controllers
             return View(productList);
         }
 
+
+        [Route("addcart/{productid:int}", Name = "addcart")]
+        public IActionResult AddToCart([FromRoute] int productid)
+        {
+            try
+            {
+                var product = productRepository.GetProductByID(productid);
+                if (product == null)
+                    return NotFound("Không có sản phẩm");
+
+                // Xử lý đưa vào Cart ...
+                var cart = GetCartItems();
+                var cartitem = cart.Find(p => p.product.ProductId == productid);
+                if (cartitem != null)
+                {
+                    // Đã tồn tại, tăng thêm 1
+                    cartitem.quantity++;
+                }
+                else
+                {
+                    //  Thêm mới
+                    cart.Add(new CartItem() { quantity = 1, product = product });
+                }
+
+                // Lưu cart vào Session
+                SaveCartSession(cart);
+                // Chuyển đến trang hiện thị Cart
+                return RedirectToAction(nameof(Cart));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        [Route("/cart", Name = "cart")]
+        public IActionResult Cart()
+        {
+            return View(GetCartItems());
+        }
+
         // GET: HomeController1/Details/5
         public ActionResult Details(int? id)
         {
-            if(id == null)
+            if (id == null)
             {
                 return NotFound();
             }
             var product = productRepository.GetProductByID(id.Value);
-            if(product == null)
+            if (product == null)
             {
+
                 return NotFound();
             }
             return View(product);
+        }
+
+        List<CartItem> GetCartItems()
+        {
+
+            var session = HttpContext.Session;
+            string jsoncart = session.GetString(CARTKEY);
+            if (jsoncart != null)
+            {
+                return JsonConvert.DeserializeObject<List<CartItem>>(jsoncart);
+            }
+            return new List<CartItem>();
+        }
+
+        void ClearCart()
+        {
+            var session = HttpContext.Session;
+            session.Remove(CARTKEY);
+        }
+
+        void SaveCartSession(List<CartItem> ls)
+        {
+            var session = HttpContext.Session;
+            string jsoncart = JsonConvert.SerializeObject(ls);
+            session.SetString(CARTKEY, jsoncart);
+        }
+
+        [Route("/updatecart", Name = "updatecart")]
+        [HttpPost]
+        public IActionResult UpdateCart([FromForm] int productid, [FromForm] int quantity)
+        {
+            // Cập nhật Cart thay đổi số lượng quantity ...
+            var cart = GetCartItems();
+            var cartitem = cart.Find(p => p.product.ProductId == productid);
+            if (cartitem != null)
+            {
+                // Đã tồn tại, tăng thêm 1
+                cartitem.quantity = quantity;
+            }
+            SaveCartSession(cart);
+            // Trả về mã thành công (không có nội dung gì - chỉ để Ajax gọi)
+            return Ok();
+        }
+
+        [Route("/removecart/{productid:int}", Name = "removecart")]
+        public IActionResult RemoveCart([FromRoute] int productid)
+        {
+            var cart = GetCartItems();
+            var cartitem = cart.Find(p => p.product.ProductId == productid);
+            if (cartitem != null)
+            {
+                // Đã tồn tại, tăng thêm 1
+                cart.Remove(cartitem);
+            }
+
+            SaveCartSession(cart);
+            return RedirectToAction(nameof(Cart));
         }
 
         // GET: HomeController1/Create
@@ -52,7 +154,7 @@ namespace eStore.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ViewBag.Message = ex.Message;
                 return View(product);
@@ -63,12 +165,12 @@ namespace eStore.Controllers
         [Route("Product/Edit")]
         public ActionResult Edit(int? id)
         {
-            if(id == null)
+            if (id == null)
             {
                 return NotFound();
             }
             var product = productRepository.GetProductByID(id.Value);
-            if(product == null)
+            if (product == null)
             {
                 return NotFound();
             }
@@ -98,7 +200,7 @@ namespace eStore.Controllers
         // GET: HomeController1/Delete/5
         public ActionResult Delete(int? id)
         {
-            if(id == null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -126,6 +228,6 @@ namespace eStore.Controllers
                 return View();
             }
         }
-        
+
     }
 }

@@ -30,7 +30,7 @@ namespace DataAccess
 
         public List<ProductObject> GetProducts()
         {
-            string SQLSelect = "SELECT ProductId, CategoryId, ProductName, Weight, UnitPrice, UnitsInStock FROM Product";
+            string SQLSelect = "SELECT ProductId, CategoryId, ProductName, Weight, UnitPrice, UnitsInStock FROM Product where status = 1";
             var products = new List<ProductObject>();
             IDataReader dataReader = null;
             try
@@ -108,7 +108,7 @@ namespace DataAccess
                 ProductObject productByID = GetProductWithID(product.ProductId);
                 if (productByID == null)
                 {
-                    string SQLInsert = "INSERT Product VALUES(@ProductId, @CategoryId, @ProductName, @Weight, @UnitPrice, @UnitsInStock)";
+                    string SQLInsert = "INSERT Product VALUES(@ProductId, @CategoryId, @ProductName, @Weight, @UnitPrice, @UnitsInStock, 1)";
                     var parameters = new List<SqlParameter>();
                     parameters.Add(DataProvider.CreateParameter("@ProductId", 4, product.ProductId, DbType.Int32));
                     parameters.Add(DataProvider.CreateParameter("@CategoryId", 4, product.CategoryId, DbType.Int32));
@@ -172,7 +172,7 @@ namespace DataAccess
                 ProductObject productByID = GetProductWithID(productID);
                 if (productByID != null)
                 {
-                    string SQLDelete = "DELETE Product WHERE productID = @productID";
+                    string SQLDelete = "Update Product set status = 0 where ProductId = @productID";
                     var parameters = new List<SqlParameter>();
                     parameters.Add(DataProvider.CreateParameter("@productID", 4, productID, DbType.Int32));
                     DataProvider.Update(SQLDelete, CommandType.Text, parameters.ToArray());

@@ -7,7 +7,7 @@
     int? memberId = Context.Session.GetInt32("id");
 }
 @if(memberId != null){
-    <h1>Index</h1>
+    <h1>Order</h1>
     if(memberId == 1){
         <p>
             <a asp-action="Create">Create New</a>

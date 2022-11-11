@@ -49,7 +49,7 @@
             @Html.DisplayFor(model => model.UnitslnStock)
         </dd>
     </dl>
-
+    
     <form asp-controller="Product" asp-action="Delete">
         <input type="hidden" value=@Model.ProductId name="id" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |

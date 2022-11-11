@@ -21,6 +21,7 @@
             </td>
             <td><input type="submit" value="search"/></td>
             <td>@Html.ActionLink("reset", "Index")</td>
+            
         </tr>
     </table>
 </form>
@@ -61,7 +62,8 @@
                         @Html.DisplayFor(modelItem => item.UnitPrice)
                     </td>
                     <td>
-                        @Html.ActionLink("View", "Details", new { id = item.ProductId })
+                        @Html.ActionLink("View", "Details", new { id = item.ProductId }) 
+                        <a asp-route="addcart"  asp-route-productid="@item.ProductId" class="btn btn-secondary btn-sm float-right">Add to cart</a>
                     </td>
                 </tr>
             }

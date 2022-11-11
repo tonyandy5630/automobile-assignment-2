@@ -34,10 +34,11 @@ namespace eStore.Controllers
                     min = 200;
                     max = 500;
                 }
+                productList = productList.Where(pro => pro.UnitPrice >= min && pro.UnitPrice <= max);
             }
             if (txtsearch != null)
             {
-                productList = productList.Where(pro => pro.ProductName.Contains(txtsearch) && pro.UnitPrice >= min && pro.UnitPrice <= max);
+                productList = productList.Where(pro => pro.ProductName.Contains(txtsearch));
             }
             return View(productList);
         }

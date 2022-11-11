@@ -64,7 +64,7 @@ namespace DataAccess
        
         public List<MemberObject> GetUsers()
         {
-            string SQLSelect = "SELECT MemberId, Email, CompanyName, City, Country, Password FROM Member";
+            string SQLSelect = "SELECT MemberId, Email, CompanyName, City, Country, Password FROM Member where status = 1";
             var users = new List<MemberObject>();
             IDataReader dataReader = null;
             try
@@ -127,7 +127,7 @@ namespace DataAccess
                 MemberObject userByID = GetUserWithID(user.MemberId);
                 if (userByID == null)
                 {
-                    string SQLInsert = "INSERT Member VALUES(@UserId, @Email, @CompanyName, @City, @Country, @Password)";
+                    string SQLInsert = "INSERT Member VALUES(@UserId, @Email, @CompanyName, @City, @Country, @Password, 1)";
                     var parameters = new List<SqlParameter>();
                     parameters.Add(DataProvider.CreateParameter("@UserId", 4, user.MemberId, DbType.Int32));
                     parameters.Add(DataProvider.CreateParameter("@Email", 100, user.Email, DbType.String));
@@ -158,7 +158,7 @@ namespace DataAccess
                 MemberObject member = GetUserWithID(userID);
                 if (member != null)
                 {
-                    string SQLDelete = "DELETE Member WHERE MemberId = @UserId";
+                    string SQLDelete = "Update Member Set status = 0 where MemberId = @UserId";
                     var parameters = new List<SqlParameter>();
                     parameters.Add(DataProvider.CreateParameter("@UserId", 4, userID, DbType.Int32));
                     DataProvider.Update(SQLDelete, CommandType.Text, parameters.ToArray());
@@ -185,7 +185,7 @@ namespace DataAccess
                 MemberObject userById = GetUserWithID(user.MemberId);
                 if (userById != null)
                 {
-                    string SQLInsert = "UPDATE Member SET MemberId = @UserId, Email = @Email, CompanyName = @CompanyName, City = @City, Country = @Country, Password = @Password WHERE MemberId = @UserId";
+                    string SQLInsert = "UPDATE Member SET MemberId = @UserId, Email = @Email, CompanyName = @CompanyName, City = @City, Country = @Country, Password = @Password WHERE MemberId = @UserId ";
                     var parameters = new List<SqlParameter>();
                     parameters.Add(DataProvider.CreateParameter("@UserId", 4, user.MemberId, DbType.Int32));
                     parameters.Add(DataProvider.CreateParameter("@Email", 100, user.Email, DbType.String));
@@ -216,7 +216,7 @@ namespace DataAccess
             MemberObject user = null;
             try
             {
-                string SQLSelect = "SELECT MemberId, Email, CompanyName, City, Country, Password FROM Member WHERE Email = @Email AND Password = @Password";
+                string SQLSelect = "SELECT MemberId, Email, CompanyName, City, Country, Password FROM Member WHERE Email = @Email AND Password = @Password and status = 1";
                 var parameters = new List<SqlParameter>();
                 parameters.Add(DataProvider.CreateParameter("@Email", 100, email, DbType.String));
                 parameters.Add(DataProvider.CreateParameter("@Password", 30, password, DbType.String));

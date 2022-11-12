@@ -3,6 +3,7 @@ using DataAccess.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using NuGet.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,12 +29,18 @@ namespace eStore.Controllers
         }
         public ActionResult Index(string txtsearch, string price)
         {
-            ViewBag.txtsearch = txtsearch;
             var productList = productRepository.GetProducts();
-            int min = 0;
-            int max = 0;
+            if(txtsearch == null && price == null)
+            {
+                return View(productList);
+            }
+
+            ViewBag.txtsearch = txtsearch;
+            List<ProductObject> resultList = new List<ProductObject>();
             if (price != null)
             {
+                int min = 0;
+                int max = 0;
                 if (price.Equals("1"))
                 {
                     min = 0;
@@ -49,13 +56,16 @@ namespace eStore.Controllers
                     min = 200;
                     max = 500;
                 }
-                productList = productList.Where(pro => pro.UnitPrice >= min && pro.UnitPrice <= max);
+                var tmp = productList.Where(pro => pro.UnitPrice >= min && pro.UnitPrice <= max).ToList();
+                resultList.AddRange(tmp);
             }
             if (txtsearch != null)
             {
-                productList = productList.Where(pro => pro.ProductName.Contains(txtsearch));
+                var tmp = productList.Where(pro => pro.ProductName.Contains(txtsearch)).ToList();
+                resultList.AddRange(tmp);
             }
-            return View(productList);
+            resultList = resultList.OrderBy(o => o.ProductId).ToList();
+            return View(resultList);
         }
 
 

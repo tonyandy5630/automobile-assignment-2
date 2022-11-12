@@ -69,7 +69,8 @@ namespace eStore.Controllers
                         HttpContext.Session.SetInt32("id", member.MemberId);
                         SaveMemberSession(member);
 
-                        return View("../Home/Index");
+                        /*return View("../Product/Index");*/
+                        return RedirectToAction("Index","Product");
                     }
                     else
                     {

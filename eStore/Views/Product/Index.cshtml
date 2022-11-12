@@ -1,99 +1,104 @@
 ﻿@using Microsoft.AspNetCore.Http
 @model IEnumerable<BusinessObject.ProductObject>
-
+@using Newtonsoft.Json
+@inject IHttpContextAccessor HttpContextAccessor
+@using BusinessObject
+@using eStore.Controllers.Utils
+@{
+    const string MEMBER_KEY = "Member";
+    MemberObject member = SessionExtensionsUtils.GetObjectFromJson<MemberObject>(Context.Session, MEMBER_KEY);
+}
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    int? memberId = Context.Session.GetInt32("id");
 }
-@if (memberId != null)
-{
-    <h1>Product</h1>
-    if (memberId == 1)
-    {
-        <p>
-            <a asp-action="Create">Create New</a>
-        </p>
-    }
-    <form asp-controller="Search" asp-action="Index">
-        <table>
-            <tr style="width:5%">
-                <td>Product Name: <input type="text" name="txtsearch" value="@ViewBag.txtsearch" /></td>
-                <td>
-                    Price range:
-                    <select name="price">
-                        <option value="1">$0-$50</option>
-                        <option value="2">$50-$200</option>
-                        <option value="3">$200-$500</option>
-                    </select>
-                </td>
-                <td><input type="submit" value="search" /></td>
-                <td>@Html.ActionLink("reset", "Index")</td>
-            </tr>
-        </table>
-    </form>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.ProductId)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.CategoryId)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ProductName)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Weight)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.UnitPrice)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.UnitslnStock)
-                </th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ProductId)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.CategoryId)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ProductName)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Weight)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.UnitPrice)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.UnitslnStock)
-                    </td>
-                    <td>
-                        @Html.ActionLink("Details", "Details", new { id = item.ProductId }) |
-                        @if (memberId == 1)
-                        {
-                            @Html.ActionLink("Edit", "Edit", new { id = item.ProductId })
-                            @Html.ActionLink("Delete", "Delete", new { id = item.ProductId })
-                        }
-                        else
-                        {
-                            <a asp-route="addcart" asp-route-productid="@item.ProductId" class="btn btn-secondary btn-sm float-right">Đặt hàng</a>
-                        }
 
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+<h1>Product</h1>
+@if (member != null && member.MemberId == 1)
+{
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
 }
+<form asp-controller="Product" asp-action="Index">
+    <table>
+        <tr style="width:5%">
+            <td>Product Name: <input type="text" name="txtsearch" value="@ViewBag.txtsearch" /></td>
+            <td>
+                Price range:
+                <select name="price">
+                    <option value="1">$0-$50</option>
+                    <option value="2">$50-$200</option>
+                    <option value="3">$200-$500</option>
+                </select>
+            </td>
+            <td><input type="submit" value="search" /></td>
+            <td>@Html.ActionLink("reset", "Index")</td>
+        </tr>
+    </table>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CategoryId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Weight)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UnitPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UnitslnStock)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProductId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CategoryId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProductName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Weight)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UnitPrice)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UnitslnStock)
+                </td>
+                <td>
+                    @Html.ActionLink("Details", "Details", new { id = item.ProductId }) |
+                    @if (member != null && member.MemberId == 1)
+                    {
+                        @Html.ActionLink("Edit", "Edit", new { id = item.ProductId })
+                        @Html.ActionLink("Delete", "Delete", new { id = item.ProductId })
+                    }
+                    else
+                    {
+                        <a asp-route="addcart" asp-route-productid="@item.ProductId" class="btn btn-secondary btn-sm float-right">Add to cart</a>
+                    }
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
 

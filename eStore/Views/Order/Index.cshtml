@@ -1,18 +1,32 @@
 ﻿@using Microsoft.AspNetCore.Http
 @model IEnumerable<BusinessObject.OrderObject>
+@using BusinessObject
+@using eStore.Controllers.Utils
+@{
+    const string MEMBER_KEY = "Member";
+    MemberObject member = SessionExtensionsUtils.GetObjectFromJson<MemberObject>(Context.Session, MEMBER_KEY);
+}
+@{
+    ViewData["Title"] = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
     int? memberId = Context.Session.GetInt32("id");
 }
-@if(memberId != null){
-    <h1>Order</h1>
-    if(memberId == 1){
-        <p>
-            <a asp-action="Create">Create New</a>
-        </p>
-    }
+
+<h1>Order</h1>
+@*@if (member != null && member.MemberId == 1)
+{
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+}*@
+<br />
+@if (Model != null && Model.Any())
+{
     <table class="table">
         <thead>
             <tr>
@@ -42,11 +56,16 @@
                         @Html.DisplayFor(modelItem => item.OrderDate)
                     </td>
                     <td>
-                        @Html.ActionLink("Edit", "Edit", new { id = item.OrderId }) |
-                        @Html.ActionLink("Details", "Details", new { id = item.OrderId })
-                        @if (memberId == 1)
+                        @if (member == null || member.MemberId != 1)
                         {
-                            @Html.Raw("| ");
+                            @Html.ActionLink("Details", "Details", new { id = item.OrderId })
+                        }
+                        else
+                        {
+                            @*@Html.ActionLink("Edit", "Edit", new { id = item.OrderId })
+                            @Html.Raw("| ");*@
+                            @Html.ActionLink("Details", "Details", new { id = item.OrderId })
+                            @Html.Raw(" | ")
                             @Html.ActionLink("Delete", "Delete", new { id = item.OrderId })
                         }
                     </td>
@@ -54,5 +73,9 @@
             }
         </tbody>
     </table>
+}else{
+    <h3>Don't have order in list</h3>
 }
+
+
 

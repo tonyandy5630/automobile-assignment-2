@@ -58,7 +58,7 @@
     @if (@member != null && @member.MemberId == 1)
     {
         @Html.ActionLink("Edit", "Edit", new {  id = Model.ProductId })
-        @Html.Display("|")
+        @Html.Raw(" | ")
     }
     <a asp-action="Index">Back to List</a>
 </div>

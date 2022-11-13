@@ -2,6 +2,7 @@
 using DataAccess.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Linq;
 
@@ -10,6 +11,7 @@ namespace eStore.Controllers
     public class MemberController : Controller
     {
         // GET: HomeController1
+        const string MEMBER_KEY = "Member";
         IMemberRepository memberRepository = null;
         public MemberController() => memberRepository = new MemberRepository();
         public ActionResult Index()
@@ -120,6 +122,12 @@ namespace eStore.Controllers
         {
             try
             {
+                MemberObject member = getMember();
+                if(member != null && member.MemberId == id)
+                {
+                    throw new Exception("Can't delete your self");
+
+                }
                 memberRepository.DeleteMember(id);
                 return RedirectToAction(nameof(Index));
             }
@@ -128,6 +136,18 @@ namespace eStore.Controllers
                 ViewBag.Message = ex.Message;
                 return View();
             }
+        }
+
+        public MemberObject getMember()
+        {
+            MemberObject member = null;
+            var session = HttpContext.Session;
+            string jsonMember = session.GetString(MEMBER_KEY);
+            if (jsonMember != null)
+            {
+                return JsonConvert.DeserializeObject<MemberObject>(jsonMember);
+            }
+            return member;
         }
     }
 }

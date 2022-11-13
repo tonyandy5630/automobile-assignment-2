@@ -17,111 +17,118 @@
 @{
     BusinessObject.OrderObject order = ViewBag.order;
 }
+@if(member != null){
+    <div>
+        <h4>Order Details</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">
+                OrderId
+            </dt>
+            <dd class="col-sm-10">
+                @order.OrderId
+            </dd>
+            <dt class="col-sm-2">
+                MemberId
+            </dt>
+            <dd class="col-sm-10">
+                @order.MemberId
+            </dd>
+            <dt class="col-sm-2">
+                OrderDate
+            </dt>
+            <dd class="col-sm-10">
+                @order.OrderDate
+            </dd>
+            <dt class="col-sm-2">
+                RequiredDate
+            </dt>
+            <dd class="col-sm-10">
+                @order.RequiredDate
+            </dd>
+            <dt class="col-sm-2">
+                ShippedDate
+            </dt>
+            <dd class="col-sm-10">
+                @order.ShippedDate
+            </dd>
+            <dt class="col-sm-2">
+                Freight
+            </dt>
+            <dd class="col-sm-10">
+                @order.Freight
+            </dd>
 
-<div>
-    <h4>Order Details</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            OrderId
-        </dt>
-        <dd class="col-sm-10">
-            @order.OrderId
-        </dd>
-        <dt class="col-sm-2">
-            MemberId
-        </dt>
-        <dd class="col-sm-10">
-            @order.MemberId
-        </dd>
-        <dt class="col-sm-2">
-            OrderDate
-        </dt>
-        <dd class="col-sm-10">
-            @order.OrderDate
-        </dd>
-        <dt class="col-sm-2">
-            RequiredDate
-        </dt>
-        <dd class="col-sm-10">
-            @order.RequiredDate
-        </dd>
-        <dt class="col-sm-2">
-            ShippedDate
-        </dt>
-        <dd class="col-sm-10">
-            @order.ShippedDate
-        </dd>
-        <dt class="col-sm-2">
-            Freight
-        </dt>
-        <dd class="col-sm-10">
-            @order.Freight
-        </dd>
-        
-    </dl>
-</div>
+        </dl>
+    </div>
 
-<br />
-@if(Model != null && Model.Any() ){
-    <h4>ProductList</h4>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.ProductId)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.CategoryId)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ProductName)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Weight)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.UnitPrice)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.UnitslnStock)
-                </th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ProductId)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.CategoryId)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ProductName)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Weight)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.UnitPrice)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.UnitslnStock)
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
-    
-}else{
-    <h3>There is no product in order!</h3>
     <br />
+    @if (Model != null && Model.Any())
+    {
+        <h4>ProductList</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ProductId)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CategoryId)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ProductName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Weight)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UnitPrice)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UnitslnStock)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ProductId)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CategoryId)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ProductName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Weight)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.UnitPrice)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.UnitslnStock)
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+
+    }
+    else
+    {
+        <h3>There is no product in order!</h3>
+        <br />
+    }
+    <div>
+        <a asp-action="Index">Back to List</a>
+    </div>
+}else{
+    <h3>Login to view this page</h3>
 }
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+
 

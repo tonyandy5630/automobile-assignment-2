@@ -39,11 +39,9 @@ namespace eStore.Controllers
         {
             var orders = orderRepository.GetOrders();
             OrderObject order = orders.SingleOrDefault(o => o.OrderId == id);
-            ViewBag.order = order;
             var orderDetails = orderDetailRepository.GetOrdersByOrderID(order.OrderId);
-            var product = productRepository.GetProducts();
-            var result = orderDetails.Join(product, a => a.ProductId, b => b.ProductId, (a, b) => b).Distinct();
-            return View(result);
+            ViewBag.order = order;
+            return View(orderDetails);
         }
 
         // GET: HomeController1/Create

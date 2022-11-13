@@ -3,11 +3,9 @@ using DataAccess.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using NuGet.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata;
 
 namespace eStore.Controllers
 {
@@ -216,7 +214,7 @@ namespace eStore.Controllers
                 MemberObject member = getMember();
                 if(member == null)
                 {
-                    return RedirectToAction(nameof(Cart));
+                    return RedirectToAction("Index","Login");
                 }
                 //add new order
                 int orderID = getMaxIdOrder() + 1;
@@ -256,7 +254,7 @@ namespace eStore.Controllers
                     orderDetailRepository.InsertOrderDetail(orderDetail);
                 }
                 ClearCart();
-                return RedirectToAction(nameof(Cart));
+                return RedirectToAction("Index","Order");
             }
             catch(Exception ex)
             {

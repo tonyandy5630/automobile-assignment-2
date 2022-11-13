@@ -134,7 +134,7 @@ namespace eStore.Controllers
             catch (Exception ex)
             {
                 ViewBag.Message = ex.Message;
-                return View();
+                return View(memberRepository.getMemberByID(id));
             }
         }
 

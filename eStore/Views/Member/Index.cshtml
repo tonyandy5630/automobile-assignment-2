@@ -69,7 +69,7 @@
                         <td>
                             @Html.ActionLink("Edit", "Edit", new { id = item.MemberId }) |
                             @Html.ActionLink("Details", "Details", new { id = item.MemberId })
-                            @if (member.MemberId == item.MemberId)
+                            @if (member.MemberId != item.MemberId)
                             {
                                 @Html.Raw("| ")
                                 @Html.ActionLink("Delete", "Delete", new { id = item.MemberId })

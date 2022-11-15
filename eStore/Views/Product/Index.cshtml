@@ -1,37 +1,45 @@
 ﻿@using Microsoft.AspNetCore.Http
 @model IEnumerable<BusinessObject.ProductObject>
-
+@using Newtonsoft.Json
+@inject IHttpContextAccessor HttpContextAccessor
+@using BusinessObject
+@using eStore.Controllers.Utils
+@{
+    const string MEMBER_KEY = "Member";
+    MemberObject member = SessionExtensionsUtils.GetObjectFromJson<MemberObject>(Context.Session, MEMBER_KEY);
+}
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    int? memberId = Context.Session.GetInt32("id");
 }
-@if (memberId != null)
+
+<h1>Product</h1>
+@if (member != null && member.MemberId == 1)
 {
-    <h1>Product</h1>
-    if (memberId == 1)
-    {
-        <p>
-            <a asp-action="Create">Create New</a>
-        </p>
-    }
-    <form asp-controller="Search" asp-action="Index">
-        <table>
-            <tr style="width:5%">
-                <td>Product Name: <input type="text" name="txtsearch" value="@ViewBag.txtsearch" /></td>
-                <td>
-                    Price range:
-                    <select name="price">
-                        <option value="1">$0-$50</option>
-                        <option value="2">$50-$200</option>
-                        <option value="3">$200-$500</option>
-                    </select>
-                </td>
-                <td><input type="submit" value="search" /></td>
-                <td>@Html.ActionLink("reset", "Index")</td>
-            </tr>
-        </table>
-    </form>
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+}
+<form asp-controller="Product" asp-action="Index">
+    <table>
+        <tr style="width:5%">
+            <td>Product Name: <input type="text" name="txtsearch" value="@ViewBag.txtsearch" /></td>
+            <td>
+                Price range:
+                <select name="price">
+                    <option value="1">$0-$50</option>
+                    <option value="2">$50-$200</option>
+                    <option value="3">$200-$500</option>
+                </select>
+            </td>
+            <td><input type="submit" value="search" /></td>
+            <td>@Html.ActionLink("reset", "Index")</td>
+        </tr>
+    </table>
+</form>
+
+<br />
+@if(Model != null && Model.Any()){
     <table class="table">
         <thead>
             <tr>
@@ -80,14 +88,15 @@
                     </td>
                     <td>
                         @Html.ActionLink("Details", "Details", new { id = item.ProductId }) |
-                        @if (memberId == 1)
+                        @if (member != null && member.MemberId == 1)
                         {
                             @Html.ActionLink("Edit", "Edit", new { id = item.ProductId })
+                            @Html.Raw(" | ")
                             @Html.ActionLink("Delete", "Delete", new { id = item.ProductId })
                         }
                         else
                         {
-                            <a asp-route="addcart" asp-route-productid="@item.ProductId" class="btn btn-secondary btn-sm float-right">Đặt hàng</a>
+                            <a asp-route="addcart" asp-route-productid="@item.ProductId" class="btn btn-secondary btn-sm float-right">Add to cart</a>
                         }
 
                     </td>
@@ -95,5 +104,9 @@
             }
         </tbody>
     </table>
+}else{
+    <h3>Don't have product in list</h3>
 }
+
+
 

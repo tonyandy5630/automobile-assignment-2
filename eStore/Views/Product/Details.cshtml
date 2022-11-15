@@ -1,5 +1,10 @@
 ﻿@model BusinessObject.ProductObject
-
+@using BusinessObject
+@using eStore.Controllers.Utils
+@{
+    const string MEMBER_KEY = "Member";
+    MemberObject member = SessionExtensionsUtils.GetObjectFromJson<MemberObject>(Context.Session, MEMBER_KEY);
+}
 @{
     ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -50,6 +55,10 @@
     </dl>
 </div>
 <div>
-    @Html.ActionLink("Edit", "Edit", new {  id = Model.ProductId }) |
+    @if (@member != null && @member.MemberId == 1)
+    {
+        @Html.ActionLink("Edit", "Edit", new {  id = Model.ProductId })
+        @Html.Raw(" | ")
+    }
     <a asp-action="Index">Back to List</a>
 </div>

@@ -1,8 +1,12 @@
 ﻿using BusinessObject;
 using DataAccess.Repository;
+using eStore.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
+using System.Diagnostics;
 using System.Text.Json;
 
 namespace eStore.Controllers
@@ -11,91 +15,104 @@ namespace eStore.Controllers
     {
         // GET: LoginController
         IMemberRepository memRepo = new MemberRepository();
-        const string SessionName = "_Name";
-        public ActionResult Index()
+        const string SESSION_NAME = "_Name";
+        const string MEMBER_KEY = "Member";
+        public const string CARTKEY = "cart";
+
+        private readonly ILogger<LoginController> _logger;
+
+        public LoginController(ILogger<LoginController> logger)
+        {
+            _logger = logger;
+        }
+
+        public IActionResult Index()
         {
             return View();
         }
 
-
-        // GET: LoginController/Details/5
-        public ActionResult Details(int id)
+        public IActionResult Login()
         {
             return View();
         }
 
-        // GET: LoginController/Create
-        public ActionResult Create()
+        public IActionResult Privacy()
         {
             return View();
         }
 
-        // POST: LoginController/Login
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Login(string email, string password)
         {
-                MemberObject member;
+            MemberObject member;
             try
             {
                 if (ModelState.IsValid)
-                { 
+                {
                     member = memRepo.Login(email, password);
-                    if(member != null)
+                    if (member != null)
                     {
-                        HttpContext.Session.SetString(SessionName, member.MemberId.ToString());
-                    }
+                        //ISession session = new Session()
+                        HttpContext.Session.SetString(SESSION_NAME, member.Email);
+                        HttpContext.Session.SetInt32("id", member.MemberId);
+                        SaveMemberSession(member);
 
+                        /*return View("../Product/Index");*/
+                        return RedirectToAction("Index", "Product");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "Username or password  incorrect");
+                        ViewBag.Warning = "Username or password  incorrect";
+                        return View("../Login/Index");
+                    }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
-            return RedirectToAction("Index");
-            
+            return View("../Product/Index");
+
+        }
+        MemberObject GetMemberFromSession()
+        {
+
+            var session = HttpContext.Session;
+            string member = session.GetString(MEMBER_KEY);
+            if (member != null)
+            {
+                return JsonConvert.DeserializeObject<MemberObject>(member);
+            }
+            return null;
         }
 
-        // GET: LoginController/Edit/5
-        public ActionResult Edit(int id)
+        void SaveMemberSession(MemberObject mem)
         {
-            return View();
+            var session = HttpContext.Session;
+            string member = JsonConvert.SerializeObject(mem);
+            session.SetString(MEMBER_KEY, member);
         }
 
-        // POST: LoginController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        void ClearMember()
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            var session = HttpContext.Session;
+            session.Remove(MEMBER_KEY);
+            session.Remove(CARTKEY);
         }
 
-        // GET: LoginController/Delete/5
-        public ActionResult Delete(int id)
+        [Route("Login/Logout")]
+        public ActionResult Logout()
         {
-            return View();
-        }
-
-        // POST: LoginController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            HttpContext.Session.Clear();
+            return View("../Login/Index");
         }
     }
 }

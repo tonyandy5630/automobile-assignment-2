@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Reflection.Metadata;
+using System.Linq;
 
 namespace eStore.Controllers
 {
@@ -13,12 +13,57 @@ namespace eStore.Controllers
     {
         // GET: HomeController1
         IProductRepository productRepository = null;
+        IOrderDetailRepository orderDetailRepository = null;
+        IOrderRepository orderRepository = null;
         public const string CARTKEY = "cart";
-        public ProductController() => productRepository = new ProductRepository();
-        public ActionResult Index()
+        const string MEMBER_KEY = "Member";
+        const int SHIP_TIME = 7;
+        const int FREIGHT = 10;
+        public ProductController()
+        {
+            productRepository = new ProductRepository();
+            orderDetailRepository = new OrderDetailRepository();
+            orderRepository = new OrderRepository();
+        }
+        public ActionResult Index(string txtsearch, string price)
         {
             var productList = productRepository.GetProducts();
-            return View(productList);
+            if(txtsearch == null && price == null)
+            {
+                return View(productList);
+            }
+
+            ViewBag.txtsearch = txtsearch;
+            List<ProductObject> resultList = new List<ProductObject>();
+            if (price != null)
+            {
+                int min = 0;
+                int max = 0;
+                if (price.Equals("1"))
+                {
+                    min = 0;
+                    max = 50;
+                }
+                if (price.Equals("2"))
+                {
+                    min = 50;
+                    max = 200;
+                }
+                if (price.Equals("3"))
+                {
+                    min = 200;
+                    max = 500;
+                }
+                var tmp = productList.Where(pro => pro.UnitPrice >= min && pro.UnitPrice <= max).ToList();
+                resultList.AddRange(tmp);
+            }
+            if (txtsearch != null)
+            {
+                var tmp = productList.Where(pro => pro.ProductName.Contains(txtsearch)).ToList();
+                resultList.AddRange(tmp);
+            }
+            resultList = resultList.OrderBy(o => o.ProductId).ToList();
+            return View(resultList);
         }
 
 
@@ -83,6 +128,7 @@ namespace eStore.Controllers
             return View(product);
         }
 
+
         List<CartItem> GetCartItems()
         {
 
@@ -94,6 +140,18 @@ namespace eStore.Controllers
             }
             return new List<CartItem>();
         }
+        MemberObject getMember()
+        {
+            MemberObject member = null;
+            var session = HttpContext.Session;
+            string jsonMember = session.GetString(MEMBER_KEY);
+            if (jsonMember != null)
+            {
+                return JsonConvert.DeserializeObject<MemberObject>(jsonMember);
+            }
+            return member;
+        }
+
 
         void ClearCart()
         {
@@ -138,6 +196,77 @@ namespace eStore.Controllers
 
             SaveCartSession(cart);
             return RedirectToAction(nameof(Cart));
+        }
+        public int getMaxIdOrder()
+        {
+            int result = 0;
+            var orderList = orderRepository.GetOrders();
+            foreach (var order in orderList)
+            {
+                if(order.OrderId > result)
+                {
+                    result = order.OrderId;
+                }
+            }
+
+            return result;
+        }
+
+        public IActionResult Checkout()
+        {
+            try
+            {
+                MemberObject member = getMember();
+                if(member == null)
+                {
+                    return RedirectToAction("Index","Login");
+                }
+                //add new order
+                int orderID = getMaxIdOrder() + 1;
+                int memberID = member.MemberId;
+                DateTime orderDate = DateTime.Now;
+                DateTime requiredDate = orderDate;
+                DateTime shipDate = orderDate.AddDays(SHIP_TIME);
+                int freight = FREIGHT;
+                OrderObject orderObject = new OrderObject
+                {
+                    OrderId = orderID,
+                    Freight = freight,
+                    ShippedDate = shipDate,
+                    MemberId = memberID,
+                    OrderDate = orderDate,
+                    RequiredDate = requiredDate,
+                };
+                orderRepository.InsertOrder(orderObject);
+
+                //add new orderdetails
+                var cartItems = GetCartItems();
+                foreach (var item in cartItems)
+                {
+                    int productID = item.product.ProductId;
+                    int quantity = item.quantity;
+                    decimal unitPrice = item.product.UnitPrice;
+                    double discount = 0;
+                    OrderDetailObject orderDetail = new OrderDetailObject
+                    {
+                        OrderId = orderID,
+                        ProductId = productID,
+                        UnitPrice = unitPrice,
+                        Discount = discount,
+                        Quantity = quantity,
+
+                    };
+                    orderDetailRepository.InsertOrderDetail(orderDetail);
+                }
+                ClearCart();
+                return RedirectToAction("Index","Order");
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            
+            
         }
 
         // GET: HomeController1/Create

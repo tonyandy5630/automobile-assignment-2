@@ -1,58 +1,69 @@
 ﻿@model IEnumerable<BusinessObject.CartItem>
-
+@using BusinessObject
+@using eStore.Controllers.Utils
+@{
+    const string MEMBER_KEY = "Member";
+    MemberObject member = SessionExtensionsUtils.GetObjectFromJson<MemberObject>(Context.Session, MEMBER_KEY);
+}
 @{
     ViewData["Title"] = "Cart";
 }
-
-<h1>Cart</h1>
-
-<h2>GIỎ HÀNG</h2>
-
-@if (Model.Count() > 0 )
+@if (member != null && member.MemberId == 1)
 {
-    decimal total = 0;
-    int stt = 1;
+    <h3>This page just for user</h3>
+}
+else
+{
+    <h1>Cart</h1>
 
-    <table class="table">
-        <tr>
-            <th>#</th>
-            <th>Sản phẩm</th>
-            <th>Giá</th>
-            <th>Số lượng</th>
-            <th>Thành tiền</th>
-            <th></th>
-        </tr>
-        @foreach (var cartitem in Model)
-        {
-            var itemMoney = cartitem.quantity * cartitem.product.UnitPrice;
-            total += itemMoney;
+    <h2>GIỎ HÀNG</h2>
+    <h3>@ViewBag.Message</h3>
 
+    @if (Model.Count() > 0)
+    {
+        decimal total = 0;
+        int stt = 1;
+
+        <table class="table">
             <tr>
-                <td>@(stt++)</td>
-                <td>@cartitem.product.ProductName</td>
-                <td>@(cartitem.product.UnitPrice.ToString("n0"))</td>
-                <td><input asp-for="@cartitem.quantity" id="@($"quantity-{cartitem.product.ProductId}")" /></td>
-                <td>@(itemMoney.ToString("n0"))</td>
-                <td>
-                    <button class="btn btn-success updatecartitem"
-                    data-productid="@cartitem.product.ProductId">
-                        Update
-                    </button>
-                    <a asp-route="removecart" asp-route-productid="@cartitem.product.ProductId"
-               class="btn btn-danger">Delete</a>
-                </td>
+                <th>#</th>
+                <th>Sản phẩm</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
+                <th>Thành tiền</th>
+                <th></th>
             </tr>
-        }
-        <tr>
-            <td colspan="4" class="text-right">Tổng tiền</td>
-            <td>@(total.ToString("n0"))</td>
-            <td></td>
-        </tr>
-    </table>
+            @foreach (var cartitem in Model)
+            {
+                var itemMoney = cartitem.quantity * cartitem.product.UnitPrice;
+                total += itemMoney;
 
-    <a asp-controller="Product" asp-action="Checkout" class="btn btn-success">Gửi đơn hàng</a>
+                <tr>
+                    <td>@(stt++)</td>
+                    <td>@cartitem.product.ProductName</td>
+                    <td>@(cartitem.product.UnitPrice.ToString("n0"))</td>
+                    <td><input asp-for="@cartitem.quantity" id="@($"quantity-{cartitem.product.ProductId}")" /></td>
+                    <td>@(itemMoney.ToString("n0"))</td>
+                    <td>
+                        <button class="btn btn-success updatecartitem"
+                    data-productid="@cartitem.product.ProductId">
+                            Update
+                        </button>
+                        <a asp-route="removecart" asp-route-productid="@cartitem.product.ProductId"
+               class="btn btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td colspan="4" class="text-right">Total Amount</td>
+                <td>@(total.ToString("n0"))</td>
+                <td></td>
+            </tr>
+        </table>
 
-    @section Scripts {
+        <a asp-controller="Product" asp-action="Checkout" class="btn btn-success">Checkout</a>
+
+        @section Scripts {
     <script>
         $(document).ready(function () {
             $(".updatecartitem").click(function (event) {
@@ -74,8 +85,10 @@
         });
     </script>
       }
+    }
+    else
+    {
+        <p class="alert alert-danger">Giỏ hàng trống</p>
+    }
 }
-else
-{
-    <p class="alert alert-danger">Giỏ hàng trống</p>
-}
+

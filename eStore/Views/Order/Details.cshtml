@@ -1,109 +1,142 @@
-﻿@model IEnumerable<BusinessObject.ProductObject>
+﻿@model IEnumerable<BusinessObject.OrderDetailObject>
+@using BusinessObject
+@using DataAccess.Repository
+@using eStore.Controllers.Utils
+@{
+    const string MEMBER_KEY = "Member";
+    MemberObject member = SessionExtensionsUtils.GetObjectFromJson<MemberObject>(Context.Session, MEMBER_KEY);
+}
 
 @{
     ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    double totalAmount = 0;
+    IProductRepository productRepository = new ProductRepository();
 }
 @{
     BusinessObject.OrderObject order = ViewBag.order;
 }
+@if(member != null){
+    <div>
+        <h4>Order Details</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">
+                OrderId
+            </dt>
+            <dd class="col-sm-10">
+                @order.OrderId
+            </dd>
+            <dt class="col-sm-2">
+                MemberId
+            </dt>
+            <dd class="col-sm-10">
+                @order.MemberId
+            </dd>
+            <dt class="col-sm-2">
+                OrderDate
+            </dt>
+            <dd class="col-sm-10">
+                @order.OrderDate
+            </dd>
+            <dt class="col-sm-2">
+                RequiredDate
+            </dt>
+            <dd class="col-sm-10">
+                @order.RequiredDate
+            </dd>
+            <dt class="col-sm-2">
+                ShippedDate
+            </dt>
+            <dd class="col-sm-10">
+                @order.ShippedDate
+            </dd>
+            <dt class="col-sm-2">
+                Freight
+            </dt>
+            <dd class="col-sm-10">
+                @order.Freight
+            </dd>
 
-<div>
-    <h4>Order Details</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            OrderId
-        </dt>
-        <dd class="col-sm-10">
-            @order.OrderId
-        </dd>
-        <dt class="col-sm-2">
-            MemberId
-        </dt>
-        <dd class="col-sm-10">
-            @order.MemberId
-        </dd>
-        <dt class="col-sm-2">
-            OrderDate
-        </dt>
-        <dd class="col-sm-10">
-            @order.OrderDate
-        </dd>
-        <dt class="col-sm-2">
-            RequiredDate
-        </dt>
-        <dd class="col-sm-10">
-            @order.RequiredDate
-        </dd>
-        <dt class="col-sm-2">
-            ShippedDate
-        </dt>
-        <dd class="col-sm-10">
-            @order.ShippedDate
-        </dd>
-        <dt class="col-sm-2">
-            Freight
-        </dt>
-        <dd class="col-sm-10">
-            @order.Freight
-        </dd>
-        
-    </dl>
-</div>
+        </dl>
+    </div>
 
-<br />
-<h4>ProductList</h4>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ProductId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CategoryId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProductName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Weight)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UnitPrice)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UnitslnStock)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CategoryId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Weight)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UnitPrice)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UnitslnStock)
-            </td>
-        </tr>
+    <br />
+    @if (Model != null && Model.Any())
+    {
+        <h4>the products of order</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.OrderId)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ProductId)
+                    </th>
+                    <th>
+                        Product Name
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UnitPrice)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Quantity)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Discount)
+                    </th>
+                    <th>
+                        Total
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    double total = (int)(item.Quantity * item.UnitPrice) * (1 - item.Discount);
+                    totalAmount += total;
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.OrderId)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ProductId)
+                        </td>
+                        <td>
+                            @productRepository.GetProductByID(item.ProductId).ProductName
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.UnitPrice)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Quantity)
+                        </td>
+                        <td>
+                            @Html.Raw((item.Discount * 100) + " %")
+                        </td>
+                        <td>
+                            @total
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <p>Total Amount: @totalAmount</p>
+    }
+    else
+    {
+        <h3>There is no product in order!</h3>
+        <br />
+    }
+    <div>
+        <a asp-action="Index">Back to List</a>
+    </div>
+}else{
+    <h3>Login to view this page</h3>
 }
-    </tbody>
-</table>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+

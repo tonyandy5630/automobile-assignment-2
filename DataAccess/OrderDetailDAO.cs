@@ -118,7 +118,7 @@ namespace DataAccess
                 }
                 else
                 {
-                    throw new Exception("This orderDetail has been already existed");
+                    throw new Exception("This orderDetail  already existed");
                 }
             }
             catch (Exception ex)
